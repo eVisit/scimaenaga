@@ -40,23 +40,25 @@ module Scimaenaga
       else
         username_key = Scimaenaga.config.queryable_user_attributes[:userName]
         find_by_username = {}
-        find_by_username[username_key] = permitted_user_params[username_key]
-
         byebug
+        find_by_username[username_key] = permitted_user_params[username_key]
 
         # Original:
         # user = @company
         #        .public_send(Scimaenaga.config.scim_users_scope)
         #        .find_or_create_by(find_by_username)
+        # user.update!(permitted_user_params)
 
         # TODO: Detect if user with that email is already created in eVisit... and what to do if so?
-        if user = @company.public_send(Scimaenaga.config.scim_users_scope).where(find_by_username).first
+        user = @company
+               .public_send(Scimaenaga.config.scim_users_scope)
+               .find_by(find_by_username)
+
+        if user.present?
           user.update!(permitted_user_params)
         else
           user = User.create!(permitted_user_params)
         end
-
-
       end
 
       json_scim_response(object: user, status: :created)
@@ -106,7 +108,17 @@ module Scimaenaga
 
       def permitted_user_params
         Scimaenaga.config.mutable_user_attributes.each.with_object({}) do |attribute, hash|
-          hash[attribute] = find_value_for(attribute)
+          if attribute.is_a?(Hash)
+            byebug
+            attribute.each do |association, nested_attributes|
+              hash[association] = {}
+              nested_attributes.each do |nested_attribute|
+                hash[association][nested_attribute] = find_value_for(nested_attribute)
+              end
+            end
+          else
+            hash[attribute] = find_value_for(attribute)
+          end
         end
       end
 

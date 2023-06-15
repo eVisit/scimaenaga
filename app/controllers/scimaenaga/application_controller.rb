@@ -51,6 +51,7 @@ module Scimaenaga
 
       def path_for(attribute, object = controller_schema, path = [])
         at_path = path.empty? ? object : object.dig(*path)
+        byebug
         return path if at_path == attribute
 
         case at_path
