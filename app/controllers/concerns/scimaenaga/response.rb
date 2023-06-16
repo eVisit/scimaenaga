@@ -73,8 +73,12 @@ module Scimaenaga
       def find_value(object, schema)
         case schema
         when Hash
-          schema.each.with_object({}) do |(key, value), hash|
-            hash[key] = find_value(object, value)
+          if schema.count == 1 && Scimaenaga.config.user_nested_relationships.include?(schema.keys.first)
+            find_value(object.public_send(schema.keys.first), value)
+          else
+            schema.each.with_object({}) do |(key, value), hash|
+              hash[key] = find_value(object, value)
+            end
           end
         when Array, ActiveRecord::Associations::CollectionProxy
           schema.map do |value|
