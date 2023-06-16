@@ -109,7 +109,6 @@ module Scimaenaga
       def permitted_user_params
         Scimaenaga.config.mutable_user_attributes.each.with_object({}) do |attribute, hash|
           if attribute.is_a?(Hash)
-            byebug
             attribute.each do |association, nested_attributes|
               hash[association] = {}
               nested_attributes.each do |nested_attribute|
