@@ -40,16 +40,8 @@ module Scimaenaga
       else
         username_key = Scimaenaga.config.queryable_user_attributes[:userName]
         find_by_username = {}
-        byebug
         find_by_username[username_key] = permitted_user_params[username_key]
 
-        # Original:
-        # user = @company
-        #        .public_send(Scimaenaga.config.scim_users_scope)
-        #        .find_or_create_by(find_by_username)
-        # user.update!(permitted_user_params)
-
-        # TODO: Detect if user with that email is already created in eVisit... and what to do if so?
         user = @company
                .public_send(Scimaenaga.config.scim_users_scope)
                .find_by(find_by_username)
@@ -111,16 +103,7 @@ module Scimaenaga
 
       def permitted_user_params
         Scimaenaga.config.mutable_user_attributes.each.with_object({}) do |attribute, hash|
-          if attribute.is_a?(Hash)
-            attribute.each do |association, nested_attributes|
-              hash[association] = {}
-              nested_attributes.each do |nested_attribute|
-                hash[association][nested_attribute] = find_value_for(nested_attribute)
-              end
-            end
-          else
-            hash[attribute] = find_value_for(attribute)
-          end
+          hash[attribute] = find_value_for(attribute)
         end
       end
 
@@ -129,8 +112,9 @@ module Scimaenaga
       end
 
       def update_or_create_relationships(user)
-        Scimaenaga.config.user_relationship_schemas.each do |_key, schema|
-          params = {}
+        Scimaenaga.config.user_association_schemas.each do |_key, schema|
+          params = { customer_id: @company.id }
+
           schema[:param_keys].each do |key|
             params[key] = find_value_for(key)
           end
