@@ -42,7 +42,7 @@ module Scimaenaga
       :signing_secret,
       :signing_algorithm,
       :user_attributes,
-      :user_nested_relationships,
+      :user_relationship_schemas,
       :user_schema,
       :group_schema,
       :user_destroy_method,
@@ -58,7 +58,7 @@ module Scimaenaga
       @signing_algorithm = ALGO_NONE
       @user_schema = {}
       @user_attributes = []
-      @user_nested_relationships = []
+      @user_relationship_schemas = {}
       @user_abbreviated_schema = {}
       @group_schema = {}
       @group_abbreviated_schema = {}

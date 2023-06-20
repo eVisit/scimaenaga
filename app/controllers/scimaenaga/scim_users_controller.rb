@@ -59,6 +59,8 @@ module Scimaenaga
         else
           user = User.create!(permitted_user_params)
         end
+
+        update_or_create_relationships(user)
       end
 
       json_scim_response(object: user, status: :created)
@@ -72,6 +74,7 @@ module Scimaenaga
     def put_update
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       user.update!(permitted_user_params)
+      update_or_create_relationships(user)
       json_scim_response(object: user)
     end
 
@@ -123,6 +126,17 @@ module Scimaenaga
 
       def controller_schema
         Scimaenaga.config.mutable_user_attributes_schema
+      end
+
+      def update_or_create_relationships(user)
+        Scimaenaga.config.user_relationship_schemas.each do |_key, schema|
+          params = {}
+          schema[:param_keys].each do |key|
+            params[key] = find_value_for(key)
+          end
+
+          user.public_send(schema[:helper_method], params)
+        end
       end
   end
 end

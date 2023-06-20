@@ -73,7 +73,7 @@ module Scimaenaga
       def find_value(object, schema)
         case schema
         when Hash
-          if schema.count == 1 && Scimaenaga.config.user_nested_relationships.include?(schema.keys.first)
+          if schema.count == 1 && Scimaenaga.config.user_relationship_schemas.keys.include?(schema.keys.first)
             find_value(object.public_send(schema.keys.first), schema.values.first)
           else
             schema.each.with_object({}) do |(key, value), hash|
