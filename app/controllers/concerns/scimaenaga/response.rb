@@ -89,7 +89,7 @@ module Scimaenaga
         when Scimaenaga.config.scim_groups_model
           find_value(schema, Scimaenaga.config.group_abbreviated_schema)
         when Symbol
-          find_value(object, object.public_send(schema))
+          object.blank? ? nil : find_value(object, object.public_send(schema))
         else
           schema
         end
