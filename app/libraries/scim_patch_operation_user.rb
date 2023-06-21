@@ -39,10 +39,13 @@ class ScimPatchOperationUser < ScimPatchOperation
       #   filter: nil,
       #   rest_path: ['givenName']
       # }
-      dig_keys = [path_scim[:attribute].to_sym]
+      attribute = path_scim[:attribute].to_sym
+      dig_keys = [attribute]
 
-      # Library ignores filter conditions ([type eq "work"])
-      dig_keys << 0 if path_scim[:attribute] == 'emails'
+      if path_scim[:filter].present?
+        array_index = get_array_index(attribute, path_scim[:filter])
+        dig_keys << array_index if array_index.present?
+      end
 
       dig_keys.concat(path_scim[:rest_path].map(&:to_sym))
 
@@ -50,4 +53,14 @@ class ScimPatchOperationUser < ScimPatchOperation
       Scimaenaga.config.mutable_user_attributes_schema.dig(*dig_keys)
     end
 
+    def get_array_index(attribute, filter)
+      array = Scimaenaga.config.mutable_user_attributes_schema.dig(attribute)
+      return nil unless array.present? || array.is_a?(Array)
+
+      # Use only option if only one is present, also not sure what other operators exists so only supporting 'eq' for now.
+      return 0 if array.count == 1 || filter[:operator] != 'eq'
+
+      index = array.find_index { |hash| hash[filter[:attribute]] == filter[:parameter] }
+      index.nil? ? 0 : index
+    end
 end

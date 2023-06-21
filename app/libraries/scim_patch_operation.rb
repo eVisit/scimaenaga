@@ -39,7 +39,7 @@ class ScimPatchOperation
       #   rest_path: ['value']
       # }
       #
-      # This method suport only single operator
+      # This method supports only single operator
 
       # path: emails.value
       # filter_string: type eq "work"
