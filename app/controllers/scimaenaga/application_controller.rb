@@ -34,7 +34,6 @@ module Scimaenaga
         payload = Scimaenaga::Encoder.decode(authentication_attribute).with_indifferent_access
         searchable_attribute = payload[Scimaenaga.config.basic_auth_model_searchable_attribute]
 
-        byebug
         yield searchable_attribute, authentication_attribute
       end
 
