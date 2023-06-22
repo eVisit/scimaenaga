@@ -569,7 +569,7 @@ RSpec.describe Scimaenaga::ScimGroupsController, type: :controller do
         end
       end
 
-      context 'whenr target Group is not found' do
+      context 'when target Group is not found' do
         it 'return 404 not found' do
           expect do
             delete :destroy, params: { id: 999_999 }, as: :json

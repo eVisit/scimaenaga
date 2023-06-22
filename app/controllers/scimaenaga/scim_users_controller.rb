@@ -4,6 +4,7 @@ module Scimaenaga
   class ScimUsersController < Scimaenaga::ApplicationController
 
     def index
+      byebug
       if params[:filter].present?
         query = Scimaenaga::ScimQueryParser.new(
           params[:filter], Scimaenaga.config.queryable_user_attributes
@@ -59,6 +60,7 @@ module Scimaenaga
     end
 
     def show
+      byebug
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       json_scim_response(object: user)
     end
