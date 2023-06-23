@@ -44,6 +44,7 @@ class ScimPatchOperationUser < ScimPatchOperation
 
       if path_scim[:filter].present?
         array_index = get_array_index(attribute, path_scim[:filter])
+        byebug
         dig_keys << array_index if array_index.present?
       end
 
@@ -55,6 +56,7 @@ class ScimPatchOperationUser < ScimPatchOperation
 
     def get_array_index(attribute, filter)
       array = Scimaenaga.config.mutable_user_attributes_schema.dig(attribute)
+      byebug
       return nil unless array.present? || array.is_a?(Array)
 
       # Use only option if only one is present, also not sure what other operators exists so only supporting 'eq' for now.
