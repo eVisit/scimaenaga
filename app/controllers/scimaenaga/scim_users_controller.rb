@@ -52,7 +52,7 @@ module Scimaenaga
           user = User.create!(permitted_user_params)
         end
 
-        update_or_create_relationships(user)
+        update_or_create_assocations(user)
       end
 
       json_scim_response(object: user, status: :created)
@@ -66,7 +66,8 @@ module Scimaenaga
     def put_update
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       user.update!(permitted_user_params)
-      update_or_create_relationships(user)
+      update_or_create_assocations(user)
+
       json_scim_response(object: user)
     end
 
@@ -74,6 +75,7 @@ module Scimaenaga
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       patch = ScimPatch.new(params, :user)
       patch.save(user)
+      patch_assocations(user, patch.operations)
 
       json_scim_response(object: user)
     end
@@ -111,12 +113,31 @@ module Scimaenaga
         Scimaenaga.config.mutable_user_attributes_schema
       end
 
-      def update_or_create_relationships(user)
+      def patch_assocations(user, operations)
+        assocation_params = {}
+
+        operations.each do |operation|
+          next unless operation.association.present?
+          assocation_params[operation.assocation] = {} unless assocation_params.has_key?(operation.assocation)
+
+          assocation_params[operation.assocation][operation.path_sp] = operation.value
+        end
+
+        assocation_params.each do |assocation, params|
+          params[:company_id] = @company.id
+          helper_method = Scimaenaga.config.user_association_schemas[assocation][:helper_method]
+
+          user.public_send(helper_method, params)
+        end
+      end
+
+      def update_or_create_assocations(user)
         Scimaenaga.config.user_association_schemas.each do |_key, schema|
           params = { customer_id: @company.id }
 
-          schema[:param_keys].each do |key|
-            params[key] = find_value_for(key)
+          schema.keys.excluding(:helper_method).each do |key|
+            value = find_value_for(key)
+            params[key] = value unless value.blank?
           end
 
           user.public_send(schema[:helper_method], params)

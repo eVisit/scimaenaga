@@ -19,7 +19,14 @@ class ScimPatch
 
   def create_operation(resource_type, op, path, value)
     if resource_type == :user
-      ScimPatchOperationUser.new(op, path, value)
+      operation = ScimPatchOperationUser.new(op, path, value)
+      Scimaenaga.config.user_association_schemas.each do |key, schema|
+        next unless schema.keys.include?(operation.path_sp)
+
+        operation.association = key
+      end
+
+      operation
     else
       ScimPatchOperationGroup.new(op, path, value)
     end
@@ -28,6 +35,8 @@ class ScimPatch
   def save(model)
     model.transaction do
       @operations.each do |operation|
+        next if operation.path_sp.blank? || operation.association.present?
+
         operation.save(model)
       end
       model.save! if model.changed?

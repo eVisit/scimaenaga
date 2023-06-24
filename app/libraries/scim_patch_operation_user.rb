@@ -62,7 +62,8 @@ class ScimPatchOperationUser < ScimPatchOperation
       # Use only option if only one is present, also not sure what other operators exists so only supporting 'eq' for now.
       return 0 if array.count == 1 || filter[:operator] != 'eq'
 
-      index = array.find_index { |hash| hash[filter[:attribute]] == filter[:parameter] }
+      filter_attribute = filter[:attribute]&.to_sym
+      index = array.find_index { |hash| hash[filter_attribute] == filter[:parameter] }
       index.nil? ? 0 : index
     end
 end

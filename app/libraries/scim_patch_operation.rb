@@ -3,6 +3,7 @@
 # Parse One of "Operations" in PATCH request
 class ScimPatchOperation
   attr_reader :op, :path_scim, :path_sp, :value
+  attr_accessor :association
 
   # path presence is guaranteed by ScimPatchOperationConverter
   #
@@ -20,6 +21,7 @@ class ScimPatchOperation
     @value = value
     @path_scim = parse_path_scim(path)
     @path_sp = path_scim_to_path_sp(@path_scim)
+    @association = nil
 
     # define parse method in the inherited class
   end
