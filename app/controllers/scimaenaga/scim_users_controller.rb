@@ -52,7 +52,7 @@ module Scimaenaga
           user = User.create!(permitted_user_params)
         end
 
-        update_or_create_assocations(user)
+        update_or_create_associations(user)
       end
 
       json_scim_response(object: user, status: :created)
@@ -66,7 +66,7 @@ module Scimaenaga
     def put_update
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       user.update!(permitted_user_params)
-      update_or_create_assocations(user)
+      update_or_create_associations(user)
 
       json_scim_response(object: user)
     end
@@ -75,7 +75,7 @@ module Scimaenaga
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       patch = ScimPatch.new(params, :user)
       patch.save(user)
-      patch_assocations(user, patch.operations)
+      patch_associations(user, patch.operations)
 
       json_scim_response(object: user)
     end
@@ -113,25 +113,25 @@ module Scimaenaga
         Scimaenaga.config.mutable_user_attributes_schema
       end
 
-      def patch_assocations(user, operations)
-        assocation_params = {}
+      def patch_associations(user, operations)
+        association_params = {}
 
         operations.each do |operation|
           next unless operation.association.present?
-          assocation_params[operation.assocation] = {} unless assocation_params.has_key?(operation.assocation)
+          association_params[operation.association] = {} unless association_params.has_key?(operation.association)
 
-          assocation_params[operation.assocation][operation.path_sp] = operation.value
+          association_params[operation.association][operation.path_sp] = operation.value
         end
 
-        assocation_params.each do |assocation, params|
+        association_params.each do |association, params|
           params[:company_id] = @company.id
-          helper_method = Scimaenaga.config.user_association_schemas[assocation][:helper_method]
+          helper_method = Scimaenaga.config.user_association_schemas[association][:helper_method]
 
           user.public_send(helper_method, params)
         end
       end
 
-      def update_or_create_assocations(user)
+      def update_or_create_associations(user)
         Scimaenaga.config.user_association_schemas.each do |_key, schema|
           params = { customer_id: @company.id }
 
