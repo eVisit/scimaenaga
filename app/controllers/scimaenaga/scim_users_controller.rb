@@ -133,7 +133,7 @@ module Scimaenaga
 
       def update_or_create_associations(user)
         Scimaenaga.config.user_association_schemas.each do |_key, schema|
-          params = { customer_id: @company.id }
+          params = { company_id: @company.id }
 
           schema.keys.excluding(:helper_method).each do |key|
             value = find_value_for(key)
