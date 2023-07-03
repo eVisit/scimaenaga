@@ -46,13 +46,15 @@ module Scimaenaga
                .public_send(Scimaenaga.config.scim_users_scope)
                .find_by(find_by_username)
 
-        if user.present?
-          user.update!(permitted_user_params)
-        else
-          user = User.create!(permitted_user_params)
-        end
+        ActiveRecord::Base.transaction do
+          if user.present?
+            user.update!(permitted_user_params)
+          else
+            user = User.create!(permitted_user_params)
+          end
 
-        update_or_create_associations(user)
+          update_or_create_associations(user)
+        end
       end
 
       json_scim_response(object: user, status: :created)
@@ -65,8 +67,10 @@ module Scimaenaga
 
     def put_update
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
-      user.update!(permitted_user_params)
-      update_or_create_associations(user)
+      ActiveRecord::Base.transaction do
+        user.update!(permitted_user_params)
+        update_or_create_associations(user)
+      end
 
       json_scim_response(object: user)
     end
@@ -74,8 +78,10 @@ module Scimaenaga
     def patch_update
       user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
       patch = ScimPatch.new(params, :user)
-      patch.save(user)
-      patch_associations(user, patch.operations)
+      ActiveRecord::Base.transaction do
+        patch.save(user)
+        patch_associations(user, patch.operations)
+      end
 
       json_scim_response(object: user)
     end
