@@ -1,6 +1,9 @@
 name: Tests
 on:
-  push:
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   rubocop:
@@ -19,7 +22,9 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.0.2
-      - uses: reviewdog/action-brakeman@v1
+      - uses: reviewdog/action-brakeman@v2
+        with:
+          brakeman_flags: --except CheckEOLRails
 
   misspell:
     runs-on: ubuntu-latest
@@ -63,8 +68,10 @@ jobs:
           - 6.1.4.1
           # 2023-01-24 releases
           - 6.1.7.2
-          # 2023-03-14 releases
+          # 2023-03-13 releases
           - 6.1.7.3
+          # 2023-03-13 releases
+          - 7.0.4.3
         exclude:
           ## be careful with which versions of ruby does rails support
           ## cf https://www.fastruby.io/blog/ruby/rails/versions/compatibility-table.html
