@@ -34,6 +34,15 @@ module Scimaenaga
       end
     end
 
+    class CustomScimError < StandardError
+      attr_reader :status_code
+
+      def initialize(message, status_code = 500)
+        @status_code = status_code
+        super(message)
+      end
+    end
+
     included do
       if Rails.env.production?
         rescue_from StandardError do |exception|
@@ -44,6 +53,16 @@ module Scimaenaga
             Rails.logger.error(exception.inspect)
           end
 
+          json_response(
+            {
+              schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+              status: '500',
+            },
+            :internal_server_error
+          )
+        end
+      else
+        rescue_from StandardError do
           json_response(
             {
               schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -165,6 +184,47 @@ module Scimaenaga
             :unprocessable_entity
           )
         end
+      end
+
+      rescue_from CustomScimError do |e|
+        status = (e.status_code || '500').to_s
+        response_key = get_response_key(status)
+
+        json_response(
+          {
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
+            detail: e.message,
+            status: status,
+          },
+          response_key
+        )
+      end
+    end
+
+    private
+
+    def get_response_key(status)
+      case status.to_s
+      when '400'
+        :bad_request
+      when '401'
+        :unauthorized
+      when '404'
+        :not_found
+      when '409'
+        :conflict
+      when '413'
+        :payload_too_large
+      when '422'
+        :unprocessable_entity
+      when '500'
+        :internal_server_error
+      when '501'
+        :not_implemented
+      when '503'
+        :service_unavailable
+      else
+        :internal_server_error
       end
     end
   end

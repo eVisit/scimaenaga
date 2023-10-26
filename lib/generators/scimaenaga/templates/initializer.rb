@@ -48,7 +48,7 @@ Scimaenaga.configure do |config|
   # For example, [:created_at, :id] or { created_at: :desc }.
   # config.scim_users_list_order = :id
 
-  # Hash of queryable attribtues on the user model. If
+  # Hash of queryable attributes on the user model. If
   # the attribute is not listed in this hash it cannot
   # be queried by this Gem. The structure of this hash
   # is { queryable_scim_attribute => user_attribute }.
@@ -57,6 +57,20 @@ Scimaenaga.configure do |config|
     givenName: :first_name,
     familyName: :last_name,
     email: :email,
+  }
+
+  # Hash of association models to the user. When needing to update user
+  # association models like an address then you can use this schema.
+  # The structure of this is:
+  # { association_name: { association_attribute: queryable_scim_attribute } }
+  config.user_association_schemas = {
+    address: {
+      helper_method: :scim_address,
+      line1: :streetAddress,
+      city: :locality,
+      state: :region,
+      zip: :postalCode
+    },
   }
 
   # Array of attributes that can be modified on the
