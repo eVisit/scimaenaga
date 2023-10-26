@@ -260,6 +260,12 @@ Scimaenaga.configure do |config|
 end
 ```
 
+To provide custom error responses use the `Scimaenaga::ExceptionHandler::CustomScimError` class, with an optional second parameter of the status code you'd like returned.
+
+```ruby
+raise Scimaenaga::ExceptionHandler::CustomScimError.new("Customer Error Response Details", 400)
+```
+
 ### Schemas endpoint
 
 If you need Schemas endpoint configure `schemas`.
