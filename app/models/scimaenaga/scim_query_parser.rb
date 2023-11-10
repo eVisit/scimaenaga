@@ -31,7 +31,29 @@ module Scimaenaga
       parameter = query_elements[2..-1].join(' ')
       return if parameter.blank?
 
-      parameter.gsub(/"/, '')
+      parameter.gsub!(/"/, '')
+
+      if operator == 'LIKE'
+        case query_elements[1]
+        when 'co'
+          "%#{parameter}%"
+        when 'sw'
+          "#{parameter}%"
+        when 'ew'
+          "%#{parameter}"
+        else
+          parameter
+        end
+      else
+        case parameter.downcase
+        when 'true'
+          true
+        when 'false'
+          false
+        else
+          parameter
+        end
+      end
     end
 
     private
@@ -40,6 +62,18 @@ module Scimaenaga
         case element
         when 'eq'
           '='
+        when 'ne'
+          '!='
+        when 'co', 'sw', 'ew'
+          'LIKE'
+        when 'gt'
+          '>'
+        when 'ge'
+          '>='
+        when 'lt'
+          '<'
+        when 'le'
+          '<='
         else
           # TODO: implement additional query filters
           raise Scimaenaga::ExceptionHandler::InvalidQuery
