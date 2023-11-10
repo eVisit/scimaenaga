@@ -12,7 +12,7 @@ module Scimaenaga
         users = @company
                 .public_send(Scimaenaga.config.scim_users_scope)
                 .where(
-                  "#{Scimaenaga.config.scim_users_model
+                  "#{Scimaenaga.config.scim_users_scope}.#{Scimaenaga.config.scim_users_model
               .connection.quote_column_name(query.attribute)} #{query.operator} ?",
                   query.parameter
                 )
