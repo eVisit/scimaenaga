@@ -47,13 +47,22 @@ module Scimaenaga
                .find_by(find_by_username)
 
         ActiveRecord::Base.transaction do
-          if user.present?
-            user.update!(permitted_user_params)
-          else
+          is_new_user = (user.present?) ? false : true
+          if is_new_user
             user = User.create!(permitted_user_params)
+          else
+            user.update!(permitted_user_params)
           end
 
           update_or_create_associations(user)
+
+          # optional after_create callback for scim
+          if is_new_user && user.respond_to?(:scim_after_create)
+            scim_user_data = params['scim_user']&.to_unsafe_h&.deep_symbolize_keys || {}
+            scim_user_data[:company_id] = @company.id
+
+            user.scim_after_create(scim_user_data)
+          end
         end
       end
 
