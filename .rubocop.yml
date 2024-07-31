@@ -1,6 +1,12 @@
 AllCops:
   NewCops: enable
 
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
 Style/FrozenStringLiteralComment:
   Enabled: true
 
