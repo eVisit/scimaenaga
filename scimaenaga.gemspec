@@ -15,8 +15,8 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
-  s.required_ruby_version = '>= 2.5.9', '<= 3.3.4'
-  s.add_dependency 'rails', '>= 5.2.4.6', '< 7.2'
+  s.required_ruby_version = '>= 2.7.8', '< 3.4'
+  s.add_dependency 'rails', '>= 6.1.7.8', '< 8.0'
   s.add_runtime_dependency 'jwt', '>= 1.5'
   s.test_files = Dir['spec/**/*']
 
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rake', '~> 13.0'
   s.add_development_dependency 'rspec-rails'
-  s.add_development_dependency 'sqlite3', '~> 1.3', '< 1.5'
+  s.add_development_dependency 'sqlite3'
   s.metadata = {
     'rubygems_mfa_required' => 'true',
   }
