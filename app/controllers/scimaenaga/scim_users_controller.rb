@@ -46,6 +46,10 @@ module Scimaenaga
                .public_send(Scimaenaga.config.scim_users_scope)
                .find_by(find_by_username)
 
+        user ||= @company
+                   .public_send(:users_from_groups)
+                   .find_by(find_by_username)
+
         ActiveRecord::Base.transaction do
           is_new_user = (user.present?) ? false : true
           if is_new_user
@@ -70,12 +74,16 @@ module Scimaenaga
     end
 
     def show
-      user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
+      user = @company.public_send(Scimaenaga.config.scim_users_scope).find_by(id: params[:id])
+      user ||= @company.public_send(:users_from_groups).find(params[:id])
+
       json_scim_response(object: user)
     end
 
     def put_update
-      user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
+      user = @company.public_send(Scimaenaga.config.scim_users_scope).find_by(id: params[:id])
+      user ||= @company.public_send(:users_from_groups).find(params[:id])
+
       ActiveRecord::Base.transaction do
         user.update!(permitted_user_params)
         update_or_create_associations(user)
@@ -85,7 +93,9 @@ module Scimaenaga
     end
 
     def patch_update
-      user = @company.public_send(Scimaenaga.config.scim_users_scope).find(params[:id])
+      user = @company.public_send(Scimaenaga.config.scim_users_scope).find_by(id: params[:id])
+      user ||= @company.public_send(:users_from_groups).find(params[:id])
+
       patch = ScimPatch.new(params, :user)
       ActiveRecord::Base.transaction do
         patch.save(user)

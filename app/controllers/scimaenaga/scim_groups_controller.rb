@@ -41,17 +41,20 @@ module Scimaenaga
     end
 
     def create
-      group = @company
-              .public_send(Scimaenaga.config.scim_groups_scope)
-              .create!(permitted_group_params)
+      raise Scimaenaga::ExceptionHandler::InvalidRequest, "Group creation not permitted. #{permitted_group_params[:name]}"
 
-      json_scim_response(object: group, status: :created)
+      # group = @company
+      #         .public_send(Scimaenaga.config.scim_groups_scope)
+      #         .create!(permitted_group_params)
+      #
+      # json_scim_response(object: group, status: :created)
     end
 
     def put_update
       group = @company
               .public_send(Scimaenaga.config.scim_groups_scope)
               .find(params[:id])
+
       group.update!(permitted_group_params)
       json_scim_response(object: group)
     end
@@ -60,6 +63,7 @@ module Scimaenaga
       group = @company
               .public_send(Scimaenaga.config.scim_groups_scope)
               .find(params[:id])
+
       patch = ScimPatch.new(params, :group)
       patch.save(group)
 
@@ -95,6 +99,7 @@ module Scimaenaga
         converted = mutable_attributes.each.with_object({}) do |attribute, hash|
           hash[attribute] = find_value_for(attribute)
         end
+
         return converted unless params[:members]
 
         converted.merge(member_params)
