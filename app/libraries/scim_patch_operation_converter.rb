@@ -51,13 +51,19 @@ class ScimPatchOperationConverter
     private
 
       def convert_to_single_value_operations(op, path_base, hash_value)
-        hash_value.map do |k, v|
+        hash_value.flat_map do |k, v|
           path = if path_base.present?
                    "#{path_base}.#{k}"
                  else
                    k
                  end
-          fix_operation_format(op, path, v)
+
+          v = v.permit!.to_h if v.instance_of?(ActionController::Parameters)
+          if v.is_a?(Hash)
+            convert_to_single_value_operations(op, path, v)
+          else
+            [fix_operation_format(op, path, v)]
+          end
         end
       end
 
