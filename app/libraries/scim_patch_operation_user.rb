@@ -76,10 +76,10 @@ class ScimPatchOperationUser < ScimPatchOperation
 
       schema.each do |key, value|
         next unless key.is_a?(String) && attribute_str.start_with?(key)
-        # Ensure match is at a URI boundary (exact match or followed by ':')
-        next unless attribute_str.length == key.length || attribute_str[key.length] == ':'
+        # Ensure match is at a URI boundary (exact match or followed by ':' or '.')
+        next unless attribute_str.length == key.length || attribute_str[key.length].in?([':', '.'])
 
-        remainder = attribute_str.delete_prefix(key).delete_prefix(':')
+        remainder = attribute_str.delete_prefix(key).delete_prefix(':').delete_prefix('.')
         dig_keys = []
         dig_keys << remainder.to_sym if remainder.present?
         dig_keys.concat(rest_path.map(&:to_sym)) if rest_path.present?

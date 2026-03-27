@@ -53,7 +53,9 @@ class ScimPatchOperationConverter
       def convert_to_single_value_operations(op, path_base, hash_value)
         hash_value.flat_map do |k, v|
           path = if path_base.present?
-                   "#{path_base}.#{k}"
+                   # Extension URIs use colons as path separators (RFC 7644 Section 3.10)
+                   separator = path_base.start_with?('urn:') ? ':' : '.'
+                   "#{path_base}#{separator}#{k}"
                  else
                    k
                  end
