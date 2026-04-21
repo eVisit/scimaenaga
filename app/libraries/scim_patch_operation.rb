@@ -46,6 +46,14 @@ class ScimPatchOperation
       # path: emails.value
       # filter_string: type eq "work"
       path_str = path.dup
+
+      # URN paths (extension schema attributes) use colons as separators
+      # and may contain dots within the URN (e.g., "2.0"). Don't split
+      # on dots for these paths; resolve_extension_path handles them.
+      if path_str.start_with?('urn:')
+        return { attribute: path_str, rest_path: [] }
+      end
+
       filter_string = path_str.slice!(/\[(.+?)\]/, 0)&.slice(/\[(.+?)\]/, 1)
 
       # path_elements: ['emails', 'value']
