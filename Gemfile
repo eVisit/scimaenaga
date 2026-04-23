@@ -10,7 +10,7 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-gem 'rails', '>= 6.1.7.8', '< 8.0'
+gem 'rails', '>= 7.2', '< 8.2'
 
 group :development, :test do
   gem 'pry'

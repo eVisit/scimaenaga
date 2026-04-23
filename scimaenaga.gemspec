@@ -15,10 +15,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
-  s.required_ruby_version = '>= 2.7.8', '< 3.4'
-  s.add_dependency 'rails', '>= 6.1.7.8', '< 8.0'
-  s.add_runtime_dependency 'jwt', '>= 1.5'
-  s.test_files = Dir['spec/**/*']
+  s.required_ruby_version = '>= 2.7.8'
+  s.add_dependency 'jwt', '>= 3.0'
+  s.add_dependency 'rails', '>= 7.0', '< 8.2'
 
   s.add_development_dependency 'bundler', '~> 2.0'
   s.add_development_dependency 'factory_bot_rails'

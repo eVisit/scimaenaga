@@ -29,68 +29,70 @@ describe Scimaenaga::ScimQueryParser do
 
   describe '#operator' do
     context 'eq' do
+      let(:query_string) { 'userName eq "taro"' }
       it { expect(parser.operator).to eq '=' }
     end
 
     context 'ne' do
-      described_class.new('userName ne "taro"', queryable_attributes)
+      let(:query_string) { 'userName ne "taro"' }
       it { expect(parser.operator).to eq '!=' }
     end
 
     context 'sw' do
-      described_class.new('userName sw "taro"', queryable_attributes)
+      let(:query_string) { 'userName sw "taro"' }
       it { expect(parser.operator).to eq 'LIKE' }
     end
 
     context 'gt' do
-      described_class.new('userName gt "taro"', queryable_attributes)
+      let(:query_string) { 'userName gt "taro"' }
       it { expect(parser.operator).to eq '>' }
     end
 
     context 'ge' do
-      described_class.new('userName ge "taro"', queryable_attributes)
+      let(:query_string) { 'userName ge "taro"' }
       it { expect(parser.operator).to eq '>=' }
     end
 
     context 'lt' do
-      described_class.new('userName lt "taro"', queryable_attributes)
+      let(:query_string) { 'userName lt "taro"' }
       it { expect(parser.operator).to eq '<' }
     end
 
     context 'le' do
-      described_class.new('userName le "taro"', queryable_attributes)
+      let(:query_string) { 'userName le "taro"' }
       it { expect(parser.operator).to eq '<=' }
     end
   end
 
   describe '#parameter' do
     context 'no manipulation' do
-      it { expect(parser.perameter).to eq "taro" }
+      let(:query_string) { 'userName eq "taro"' }
+      it { expect(parser.parameter).to eq 'taro' }
     end
 
     context 'Contains' do
-      described_class.new('userName co "taro"', queryable_attributes)
-      it { expect(parser.perameter).to eq '%taro%' }
+      let(:query_string) { 'userName co "taro"' }
+      it { expect(parser.parameter).to eq '%taro%' }
     end
 
     context 'Starts with' do
-      described_class.new('userName sw "taro"', queryable_attributes)
-      it { expect(parser.perameter).to eq 'taro%' }
+      let(:query_string) { 'userName sw "taro"' }
+      it { expect(parser.parameter).to eq 'taro%' }
     end
 
     context 'Ends with' do
-      described_class.new('userName ew "taro"', queryable_attributes)
-      it { expect(parser.perameter).to eq '%taro' }
+      let(:query_string) { 'userName ew "taro"' }
+      it { expect(parser.parameter).to eq '%taro' }
     end
 
     context 'True boolean' do
-      described_class.new('userName eq "True"', queryable_attributes)
-      it { expect(parser.perameter).to eq true }
+      let(:query_string) { 'userName eq "True"' }
+      it { expect(parser.parameter).to eq true }
     end
 
     context 'False boolean' do
-      described_class.new('userName eq "FALSE"', queryable_attributes)
-      it { expect(parser.perameter).to eq false }
+      let(:query_string) { 'userName eq "FALSE"' }
+      it { expect(parser.parameter).to eq false }
     end
   end
 end
